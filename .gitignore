@@ -164,8 +164,8 @@ dmypy.json
 
 # Pyre type checker
 
-### Node Modules ###
-static/node_modules
+### Node Modules (Should Ignore But Azure Funky) ###
+# static/node_modules 
 
 ### VisualStudioCode ###
 .vscode/*
