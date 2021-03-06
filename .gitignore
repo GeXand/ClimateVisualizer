@@ -31,6 +31,7 @@ eggs/
 lib/
 lib64/
 parts/
+dist/
 sdist/
 var/
 wheels/
@@ -164,7 +165,7 @@ dmypy.json
 # Pyre type checker
 
 ### Node Modules (Should Ignore But Azure Funky) ###
-# static/node_modules 
+static/node_modules 
 
 ### VisualStudioCode ###
 .vscode/*
