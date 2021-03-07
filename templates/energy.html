@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Visualizing Energy Usage</title>
+
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <!-- jQuery library -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <!-- Latest compiled JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <!--D3 For Map Drawing-->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/d3/3.5.3/d3.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/topojson/1.6.9/topojson.min.js"></script>
+    <script src="{{ url_for('static', filename='node_modules/datamaps/dist/datamaps.all.min.js') }}"></script>
+
+    <style>
+        #fuelMapContainer {
+            position: relative;
+            margin: auto;
+            width: 960px;
+            height: 600px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Historical Energy Usage</h1>
+    <div class="container">
+        <div class="row">
+        
+            <div id="nationalUsageContainer" class="col-lg-6">National Usage: </div>
+
+            <div id="fuelDisplayType" class="col-lg-6">
+                <select name="energyDisplayType" id="energyInfoDisplayed">
+                    <option value="totalEnergy">Total Energy Consumption</option>
+                    <option value="solarEnergy">Solar Consumption</option>
+                    <option value="hydroEnergy">Hydro Consumption</option>
+                    <option value="gasEnergy">Natural Gas Consumption</option>
+                    <option value="petrolEnergy">Petroleum Consumption</option>
+                </select>
+            </div>
+
+            <div id="fuelMapContainer" class="col-lg-12"></div>
+
+            <div id="fuelMapKey">
+            </div>
+
+        </div>
+
+        <br>
+
+        <div class="row">
+            <input type="range" min="1960" max="2012" value="1960" class="slider" id="historicalYearSlider">
+            <div id="yearContainer"></div>
+            <div id="test"></div>
+        </div>
+    </div>
+
+    <script>
+        function updateColorDataset(series) {
+            dataset = {};
+
+            var seriesValues = series.map(function(obj) {return obj[1]; });
+            // for total
+            var minValue = 100000;//Math.min.apply(null, seriesValues);
+            var maxValue = 13000000; //Math.max.apply(null, seriesValues);
+
+            var paletteScale = d3.scale.linear().domain([minValue, maxValue]).range(['#ffff00','#ff0000']);
+
+            series.forEach(function(item){
+                var iso = item[0];
+                var value = item[1];
+                dataset[iso] = {fillColor: paletteScale(value), usage: value};
+            });
+
+            return dataset;
+        }
+
+        var fuelDataset = {};
+
+        var fuelMap = new Datamap({
+            element: document.getElementById('fuelMapContainer'),
+            scope: 'usa',
+            geographyConfig: {
+                highlightBorderColor: '#ffffff',
+                highlightBorderWidth: 2,
+                popupTemplate: function(geography, data) {
+                    if (!data) {return ['<div class="hoverinfo">', '<strong>', geography.properties.name, '</strong>', '</div>'].join('')}
+                    return ['<div class="hoverinfo">', '<strong>', geography.properties.name, '</strong>',
+                        ,'<br> Usage (Billions BTU): ', data.usage, '</div>'].join('');
+                }
+            },
+            fills: { defaultFill: '#ababab' },
+            data: fuelDataset
+        });
+
+        var nationalUsage = document.getElementById("nationalUsageContainer");
+        
+        $.getJSON("{{ url_for('static', filename='TotalEnergyConsumption.json') }}", function(json){
+            fuelMap.updateChoropleth(updateColorDataset(json[1960]));
+            nationalUsage.innerHTML = 'National Usage: '.concat(json[1960][51][1]);
+        });
+
+
+        // Year slider display
+        var yearSlider = document.getElementById("historicalYearSlider");
+        var year = document.getElementById("yearContainer");
+
+        
+        // initial values
+        year.innerHTML = yearSlider.value;
+
+        // change values based on slider
+        yearSlider.oninput = function() {
+            // TODO: change the data displayed by the map
+            if (this.value > 1959) {
+                $.getJSON("{{ url_for('static', filename='TotalEnergyConsumption.json') }}", function(json){
+                    fuelMap.updateChoropleth(updateColorDataset(json[yearSlider.value]));
+                    nationalUsage.innerHTML = 'National Usage: '.concat(json[yearSlider.value][51][1]);
+                });
+            } else {
+                fuelMap.updateChoropleth({});
+                nationalUsage.innerHTML = 'National Usage: N/A';
+            }
+
+            year.innerHTML = this.value;
+        }
+
+        var fuelDisplay = document.getElementById("energyInfoDisplayed");
+        fuelDisplay.onchange = function () {
+
+        }
+    </script>
+</body>
+</html>
