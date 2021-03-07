@@ -79,6 +79,46 @@
         margin-top: 8px;
         margin-bottom: 8px
     }
+
+    .nav {
+            position: absolute;
+            top: 22vh;
+            left: 20px;
+        }
+    ul {
+        list-style-type: none;
+        margin: 0;
+        width: 240px;
+        background-color: #f1f1f1;
+        position: fixed; /* Make it stick, even on scroll */
+        overflow: auto; /* Enable scrolling if the sidenav has too much content */
+        border: 1px solid #555;
+    }
+
+    li a {
+        display: block;
+        color: #000;
+        padding: 8px 16px;
+        text-decoration: none;
+        text-align: center;
+        border-bottom: 1px solid #555;
+    }
+
+    li:last-child {
+        border-bottom: none;
+    }
+
+    li a.active {
+        background-color: #4CAF50;
+        color: white;
+    }
+
+    li a:hover:not(.active) {
+        background-color: #555;
+        color: white;
+        transition: ease all 0.5s;
+    }
+    
     </style>
 </head>
 <body>
@@ -86,6 +126,14 @@
         <h1>Historical Climate Change</h1>
     </header>
     <div class="wrapper">
+        <div class="nav">
+            <ul>
+                <li><a href="https://climatev-3ef70.azurewebsites.net/">Home</a></li>
+                <li><a href="https://climatev-3ef70.azurewebsites.net/energy">Historical Energy Usage</a></li>
+                <li><a href="https://climatev-3ef70.azurewebsites.net/future">Climate Forecasting</a></li>
+                <li><a href="https://climatev-3ef70.azurewebsites.net/news">Recent News</a></li>
+            </ul>
+        </div>
         <div id="tempMapContainer"></div>
         <hr>
         <input type="range" min="1901" max="2013" value="1901" class="slider" id="historicalYearSlider">
