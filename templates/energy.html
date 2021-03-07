@@ -96,7 +96,7 @@
             }
 
 
-            var paletteScale = d3.scale.linear().domain([minValue, maxValue]).range(['#ffff00','#ff0000']);
+            var paletteScale = d3.scale.linear().domain([minValue, maxValue]).range(['#ffdede','#990000']);
 
             series.forEach(function(item){
                 var iso = item[0];
@@ -191,6 +191,8 @@
 
             year.innerHTML = this.value;
         }
+
+        // legend for map
 
     </script>
 </body>
