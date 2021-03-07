@@ -27,10 +27,10 @@ def energy():
 
 @app.route('/pred')
 def pred():
-    article_obj = extract('https://www.theguardian.com/environment/2020/aug/31/australias-big-polluters-required-to-offset-just-12-of-greenhouse-gas-emissions-in-past-year%27')
+    article_obj = extract('https://www.icis.com/explore/resources/news/2021/03/04/10613658/insight-resilient-energy-demand-may-delay-shift-from-fossil-fuels')
     return render_template('pred.html', title='pee pee', link='poo poo',
                            summary=article_obj['summary'], keywords=', '.join(article_obj['keywords']))
 
 
 if __name__ == '__main__':
-    app.run(debug=False)
+    app.run(debug=True)

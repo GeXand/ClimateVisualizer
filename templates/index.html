@@ -5,46 +5,96 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Visualizing Climate Change</title>
-
-    <!-- Latest compiled and minified CSS -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
     <!-- jQuery library -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <!-- Latest compiled JavaScript -->
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
     <!--D3 For Map Drawing-->
     <script src="//cdnjs.cloudflare.com/ajax/libs/d3/3.5.3/d3.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/topojson/1.6.9/topojson.min.js"></script>
     <script src="{{ url_for('static', filename='node_modules/datamaps/dist/datamaps.all.min.js') }}"></script>
 
     <style>
-    /* Dunno what I'm doing here */
+    * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: sans-serif;
+    }
+    body {
+        height: 100vh;
+        background-color: #f3f3f3;
+    }
+    header {
+        background: linear-gradient(90deg, #2193b0, #6dd5ed);
+        padding-top: 2.5vh;
+        padding-bottom: 2.5vh;
+        color: rgb(224, 224, 224);
+        margin-bottom: 3vh;
+        text-align: center;
+    }
+    header h1 {
+        font-weight: 700;
+        font-size: 48px;
+    }
+    #tempMapContainer {
+        height: 70vh;
+        width: 70vw;
+        margin-top: 8px;
+        margin-bottom: 22px;
+    }
+    .wrapper {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+    input[type="range"] {
+        -webkit-appearance: none;
+        width: 40%;
+        appearance: none;
+        background: #2bcf39;
+        outline: none;
+        opacity: 0.5;
+        transition: ease all 0.3s;
+    }
+
+    input[type="range"]:hover {
+        opacity: 1;
+    }
+    .slider::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 25px;
+        height: 25px;
+        background: #005e03;
+        cursor: pointer;
+    }
+
+    .slider::-moz-range-thumb {
+        width: 25px;
+        height: 25px;
+        background: #005e03;
+        cursor: pointer;
+    }
+    #yearContainer, #nationalTempContainer {
+        margin-top: 8px;
+        margin-bottom: 8px
+    }
     </style>
 </head>
 <body>
-    <h1>Historical Climate Change</h1>
-    <div class="container">
-        <div class="row">
-            <div class="col-lg-12">
-                <div class="row">
-                    <div id="nationalTempContainer" class="col-lg-12">National Average Temperature: </div>
-                </div>
-
-                <div id="tempMapContainer" class= "row"></div>
-
-                <div id="tempMapKey" class="row">
-                </div>
-            </div>
-        </div>
-        <br>
-        <div class="row">
-            <input type="range" min="1901" max="2012" value="1901" class="slider" id="historicalYearSlider">
-            <div id="yearContainer"></div>
-        </div>
+    <header>
+        <h1>Historical Climate Change</h1>
+    </header>
+    <div class="wrapper">
+        <div id="tempMapContainer"></div>
+        <hr>
+        <input type="range" min="1901" max="2012" value="1901" class="slider" id="historicalYearSlider">
+        <div id="yearContainer"></div>
+        <div id="nationalTempContainer">Temperature: too hot!</div>
     </div>
 
-    <script>
 
+    <script>
         function updateColorDataset(series) {
             dataset = {};
 
