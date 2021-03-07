@@ -6,58 +6,107 @@
 
     <title>Visualizing Energy Usage</title>
 
-    <!-- Latest compiled and minified CSS -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
     <!-- jQuery library -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <!-- Latest compiled JavaScript -->
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
     <!--D3 For Map Drawing-->
     <script src="//cdnjs.cloudflare.com/ajax/libs/d3/3.5.3/d3.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/topojson/1.6.9/topojson.min.js"></script>
     <script src="{{ url_for('static', filename='node_modules/datamaps/dist/datamaps.all.min.js') }}"></script>
 
     <style>
-        #fuelMapContainer {
-            position: relative;
-            margin: auto;
-            width: 960px;
-            height: 600px;
-        }
+    * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: sans-serif;
+    }
+    body {
+        height: 100vh;
+        background-color: #f3f3f3;
+    }
+    header {
+        background: linear-gradient(90deg, #2193b0, #6dd5ed);
+        padding-top: 2.5vh;
+        padding-bottom: 2.5vh;
+        color: rgb(224, 224, 224);
+        margin-bottom: 3vh;
+        text-align: center;
+    }
+    header h1 {
+        font-weight: 700;
+        font-size: 48px;
+    }
+    #fuelMapContainer {
+        height: 70vh;
+        width: 70vw;
+        margin-top: 8px;
+        margin-bottom: 22px;
+    }
+    .wrapper {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+    input[type="range"] {
+        -webkit-appearance: none;
+        width: 40%;
+        appearance: none;
+        background: #2bcf39;
+        outline: none;
+        opacity: 0.5;
+        transition: ease all 0.3s;
+    }
+
+    input[type="range"]:hover {
+        opacity: 1;
+    }
+    .slider::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 25px;
+        height: 25px;
+        background: #005e03;
+        cursor: pointer;
+    }
+
+    .slider::-moz-range-thumb {
+        width: 25px;
+        height: 25px;
+        background: #005e03;
+        cursor: pointer;
+    }
+    #yearContainer, #nationalUsageContainer {
+        margin-top: 8px;
+        margin-bottom: 8px
+    }
     </style>
 </head>
 <body>
-    <h1>Historical Energy Usage</h1>
-    <div class="container">
-        <div class="row">
-        
-            <div id="nationalUsageContainer" class="col-lg-6">National Usage: </div>
-
-            <div id="fuelDisplayType" class="col-lg-6">
-                <select name="energyDisplayType" id="energyInfoDisplayed">
-                    <option value="total">Total Energy Consumption</option>
-                    <option value="solar">Solar</option>
-                    <option value="hydro">Hydroelectric</option>
-                    <option value="biomass">Biomass</option>
-                    <option value="gas">Natural Gas</option>
-                    <option value="petrol">Petroleum</option>
-                </select>
-            </div>
-
-            <div id="fuelMapContainer" class="col-lg-12"></div>
-
-            <div id="fuelMapKey">
-            </div>
-
+    <header>
+        <h1>Historical Energy Usage</h1>
+    </header>
+    <div class="wrapper">
+        <div id="fuelDisplayType">
+            <select name="energyDisplayType" id="energyInfoDisplayed">
+                <option value="total">Total Energy Consumption</option>
+                <option value="solar">Solar</option>
+                <option value="hydro">Hydroelectric</option>
+                <option value="biomass">Biomass</option>
+                <option value="gas">Natural Gas</option>
+                <option value="petrol">Petroleum</option>
+            </select>
         </div>
 
-        <br>
+        <div id="fuelMapContainer"></div>
+        <hr>
+        <input type="range" min="1960" max="2012" value="1960" class="slider" class="slider" id="historicalYearSlider">
+        <div id="yearContainer"></div>
+        <div id="nationalUsageContainer" class="col-lg-6">National Usage: </div>
 
-        <div class="row">
-            <input type="range" min="1960" max="2012" value="1960" class="slider" id="historicalYearSlider">
-            <div id="yearContainer"></div>
-            <div id="test"></div>
+        <div id="fuelMapKey">
         </div>
+
     </div>
 
     <script>
@@ -96,7 +145,7 @@
             }
 
 
-            var paletteScale = d3.scale.linear().domain([minValue, maxValue]).range(['#ffdede','#990000']);
+            var paletteScale = d3.scale.linear().domain([minValue, maxValue]).range(['#fcfcbd','#630000']);
 
             series.forEach(function(item){
                 var iso = item[0];
@@ -118,7 +167,7 @@
                 popupTemplate: function(geography, data) {
                     if (!data) {return ['<div class="hoverinfo">', '<strong>', geography.properties.name, '</strong>', '</div>'].join('')}
                     return ['<div class="hoverinfo">', '<strong>', geography.properties.name, '</strong>',
-                        ,'<br> Usage (Billions BTU): ', data.usage, '</div>'].join('');
+                        ,'<br> Usage (Billion BTUs): ', data.usage, '</div>'].join('');
                 }
             },
             fills: { defaultFill: '#ababab' },
@@ -168,7 +217,7 @@
 
             $.getJSON("./static/".concat(json_file), function(json){
                 fuelMap.updateChoropleth(updateColorDataset(json[yearSlider.value]));
-                nationalUsage.innerHTML = 'National Usage: '.concat(json[yearSlider.value][51][1]);
+                nationalUsage.innerHTML = 'National Usage (Billion BTUs): '.concat(json[yearSlider.value][51][1]);
             });
         }
 
@@ -182,7 +231,7 @@
             if (this.value > 1959) {
                 $.getJSON("./static/".concat(json_file), function(json){
                     fuelMap.updateChoropleth(updateColorDataset(json[yearSlider.value]));
-                    nationalUsage.innerHTML = 'National Usage: '.concat(json[yearSlider.value][51][1]);
+                    nationalUsage.innerHTML = 'National Usage (Billion BTUs): '.concat(json[yearSlider.value][51][1]);
                 });
             } else {
                 fuelMap.updateChoropleth({});

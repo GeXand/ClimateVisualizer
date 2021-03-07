@@ -102,59 +102,60 @@
             var minValue = Math.min.apply(null, seriesValues);
             var maxValue = Math.max.apply(null, seriesValues);
 
-            var paletteScale = d3.scale.linear().domain([minValue, maxValue]).range(['#ffff00','#ff0000']);
+            var paletteScale = d3.scale.linear().domain([minValue, maxValue]).range(['#0000ff','#ffff00']);
 
             series.forEach(function(item){
                 var iso = item[0];
                 var value = item[1];
-                dataset[iso] = {fillColor: paletteScale(value), temperature: value};
+                dataset[iso] = {fillColor: paletteScale(value), temp: value};
             });
 
             return dataset;
         }
 
-        var tempDataset;
-
-        $.getJSON("{{ url_for('static', filename='TotalEnergyConsumption.json') }}", function(json){
-            fuelDataset = updateColorDataset(json['1960']);
-        });
+        var tempDataset = {};
 
         var tempMap = new Datamap({
             element: document.getElementById('tempMapContainer'),
             scope: 'usa',
             geographyConfig: {
-                highlightBorderColor: '#b7b7b7',
+                highlightBorderColor: '#ffffff',
                 highlightBorderWidth: 2,
                 popupTemplate: function(geography, data) {
                     if (!data) {return ['<div class="hoverinfo">', '<strong>', geography.properties.name, '</strong>', '</div>'].join('')}
                     return ['<div class="hoverinfo">', '<strong>', geography.properties.name, '</strong>',
-                        ,'<br> Temperature: ', data.temperature, '</div>'].join('');
+                        ,'<br> Temperature (Fahrenheit): ', data.temp, '</div>'].join('');
                 }
             },
             fills: { defaultFill: '#ababab' },
             data: tempDataset
         });
 
+        var nationalTemp = document.getElementById("nationalTempContainer");
+        
+        
+        var json_file = "TotalEnergyConsumption.json";
+
+        $.getJSON("./static/".concat('FormattedUsaTempByYear.json'), function(json){
+            tempMap.updateChoropleth(updateColorDataset(json[1901]));
+            // nationalTemp.innerHTML = 'National Temp: '.concat(json[1901][51][1]);
+        });
+
 
         // Year slider display
         var yearSlider = document.getElementById("historicalYearSlider");
         var year = document.getElementById("yearContainer");
-        var nationalTemp = document.getElementById("nationalTempContainer");
-        var nationalUsage = document.getElementById("nationalUsageContainer");
-        
+
         // initial values
         year.innerHTML = yearSlider.value;
 
         // change values based on slider
         yearSlider.oninput = function() {
-            // TODO: change the data displayed by the map
-            if (this.value > 1959) {
-                $.getJSON("{{ url_for('static', filename='TotalEnergyConsumption.json') }}", function(json){
-                    fuelMap.updateChoropleth(updateColorDataset(json[yearSlider.value]));
-                });
-            }
-            // tempMap.data = {};
-            // nationalTemp.innerHTML = {};
+            $.getJSON("./static/".concat('FormattedUsaTempByYear.json'), function(json){
+                tempMap.updateChoropleth(updateColorDataset(json[yearSlider.value]));
+                // nationalTemp.innerHTML = 'National Temp: '.concat(json[yearSlider.value][51][1]);
+            });
+
             year.innerHTML = this.value;
         }
     </script>
