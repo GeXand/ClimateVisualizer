@@ -25,60 +25,21 @@
     <h1>Historical Climate Change</h1>
     <div class="container">
         <div class="row">
-            <div class="col-lg-6">
+            <div class="col-lg-12">
                 <div class="row">
-                    <div id="nationalTempContainer" class="col-lg-6">National Average Temperature: </div>
-
-                    <div class="col-lg-6">
-                        <select name="tempDisplayType" id="tempInfoDisplayed">
-                            <option value="annualTemps">Average Annual Temps</option>
-                            <option value="summerTemps">Average Jun/Jul/Aug Temps</option>
-                            <option value="winterTemps">Average Dec/Jan/Feb Temps</option>
-                        </select>
-                    </div>
+                    <div id="nationalTempContainer" class="col-lg-12">National Average Temperature: </div>
                 </div>
 
                 <div id="tempMapContainer" class= "row"></div>
 
                 <div id="tempMapKey" class="row">
                 </div>
-
-                <!--
-                <div id="tempType">
-                    <button class="fahrenheit is-active">°F</button>
-                    <button class="celsius">°C</button>
-                </div>
-                -->
-
-            </div>
-            <div class="col-lg-6">
-                <div class="row">
-                    <div id="nationalUsageContainer" class="col-lg-6">National Usage: </div>
-
-                    <div id="fuelDisplayType" class="col-lg-6">
-                        <select name="energyDisplayType" id="energyInfoDisplayed">
-                            <option value="totalEnergy">Total Energy Consumption</option>
-                            <option value="solarEnergy">Solar Consumption</option>
-                            <option value="hydroEnergy">Hydro Consumption</option>
-                            <option value="gasEnergy">Natural Gas Consumption</option>
-                            <option value="petrolEnergy">Petroleum Consumption</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div id="fuelMapContainer" class="row"></div>
-
-                <div id="fuelMapKey" class="row">
-                </div>
-
-
             </div>
         </div>
         <br>
         <div class="row">
             <input type="range" min="1901" max="2012" value="1901" class="slider" id="historicalYearSlider">
             <div id="yearContainer"></div>
-            <div id="test"></div>
         </div>
     </div>
 
@@ -105,7 +66,7 @@
         var fuelDataset;
         var tempDataset;
 
-        $.getJSON("{{ url_for('static', filename='TotalEnergyByStateUSA.json') }}", function(json){
+        $.getJSON("{{ url_for('static', filename='TotalEnergyConsumption.json') }}", function(json){
             fuelDataset = updateColorDataset(json['1960']);
         });
 
@@ -125,23 +86,6 @@
             data: tempDataset
         });
 
-        
-        var fuelMap = new Datamap({
-            element: document.getElementById('fuelMapContainer'),
-            scope: 'usa',
-            geographyConfig: {
-                highlightBorderColor: '#b7b7b7',
-                highlightBorderWidth: 2,
-                popupTemplate: function(geography, data) {
-                    if (!data) {return ['<div class="hoverinfo">', '<strong>', geography.properties.name, '</strong>', '</div>'].join('')}
-                    return ['<div class="hoverinfo">', '<strong>', geography.properties.name, '</strong>',
-                        ,'<br> Temperature: ', data.temperature, '</div>'].join('');
-                }
-            },
-            fills: { defaultFill: '#ababab' },
-            data: fuelDataset
-        });
-
 
         // Year slider display
         var yearSlider = document.getElementById("historicalYearSlider");
@@ -156,7 +100,7 @@
         yearSlider.oninput = function() {
             // TODO: change the data displayed by the map
             if (this.value > 1959) {
-                $.getJSON("{{ url_for('static', filename='TotalEnergyByStateUSA.json') }}", function(json){
+                $.getJSON("{{ url_for('static', filename='TotalEnergyConsumption.json') }}", function(json){
                     fuelMap.updateChoropleth(updateColorDataset(json[yearSlider.value]));
                 });
             }
@@ -169,11 +113,6 @@
         // dropdown changes
         var tempDisplay = document.getElementById("tempInfoDisplayed");
         tempDisplay.onchange = function () {
-
-        }
-
-        var fuelDisplay = document.getElementById("energyInfoDisplayed");
-        fuelDisplay.onchange = function () {
 
         }
     </script>

@@ -35,11 +35,12 @@
 
             <div id="fuelDisplayType" class="col-lg-6">
                 <select name="energyDisplayType" id="energyInfoDisplayed">
-                    <option value="totalEnergy">Total Energy Consumption</option>
-                    <option value="solarEnergy">Solar Consumption</option>
-                    <option value="hydroEnergy">Hydro Consumption</option>
-                    <option value="gasEnergy">Natural Gas Consumption</option>
-                    <option value="petrolEnergy">Petroleum Consumption</option>
+                    <option value="total">Total Energy Consumption</option>
+                    <option value="solar">Solar</option>
+                    <option value="hydro">Hydroelectric</option>
+                    <option value="biomass">Biomass</option>
+                    <option value="gas">Natural Gas</option>
+                    <option value="petrol">Petroleum</option>
                 </select>
             </div>
 
@@ -104,6 +105,15 @@
             nationalUsage.innerHTML = 'National Usage: '.concat(json[1960][51][1]);
         });
 
+        
+        var fuelDisplay = document.getElementById("energyInfoDisplayed");
+
+        fuelDisplay.onchange = function () {
+            switch(this.value) {
+                case total:
+                    
+            }
+        }
 
         // Year slider display
         var yearSlider = document.getElementById("historicalYearSlider");
@@ -129,10 +139,6 @@
             year.innerHTML = this.value;
         }
 
-        var fuelDisplay = document.getElementById("energyInfoDisplayed");
-        fuelDisplay.onchange = function () {
-
-        }
     </script>
 </body>
 </html>
