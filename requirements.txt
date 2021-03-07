@@ -2,4 +2,4 @@ flask
 python-dotenv
 pygooglenews
 numpy
-newspaper
+newspaper3k
