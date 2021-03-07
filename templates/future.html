@@ -83,12 +83,12 @@
 </head>
 <body>
     <header>
-        <h1>Historical Climate Change</h1>
+        <h1>RCP 4.5 Climate Predictions</h1>
     </header>
     <div class="wrapper">
         <div id="tempMapContainer"></div>
         <hr>
-        <input type="range" min="1901" max="2013" value="1901" class="slider" id="historicalYearSlider">
+        <input type="range" min="1" max="4" value="1" class="slider" id="historicalYearSlider">
         <div id="yearContainer"></div>
         <div id="nationalTempContainer">Average Temperature: </div>
     </div>
@@ -99,8 +99,8 @@
             dataset = {};
 
             var seriesValues = series.map(function(obj) {return obj[1]; });
-            var minValue = -5;
-            var maxValue = 23;
+            var minValue = 50;
+            var maxValue = 100;
 
             var paletteScale = d3.scale.linear().domain([minValue, maxValue]).range(['#0000ff','#ffff00']);
 
@@ -124,7 +124,7 @@
                 popupTemplate: function(geography, data) {
                     if (!data) {return ['<div class="hoverinfo">', '<strong>', geography.properties.name, '</strong>', '</div>'].join('')}
                     return ['<div class="hoverinfo">', '<strong>', geography.properties.name, '</strong>',
-                        ,'<br> Temperature (Fahrenheit): ', data.temp * 1.8 + 32, '</div>'].join('');
+                        ,'<br> Temperature (Fahrenheit): ', data.temp, '</div>'].join('');
                 }
             },
             fills: { defaultFill: '#ababab' },
@@ -134,16 +134,11 @@
         var nationalTemp = document.getElementById("nationalTempContainer");
         
         
-        var json_file = "TotalEnergyConsumption.json";
+        var json_file = "ImpactLab45Summer.json";
 
-        $.getJSON("./static/".concat('FormattedUsaTempByYear.json'), function(json){
-            tempMap.updateChoropleth(updateColorDataset(json[1901]));
-            var sum = 0.000000;
-            for (var i = 0; i < 51; i++) {
-                sum += parseFloat(json[yearSlider.value][i][1]);
-            }
-            console.log(sum);
-            nationalTemp.innerHTML = 'Average National Temp: '.concat(sum/51.0 * 1.8 + 32);
+        $.getJSON("./static/".concat('ImpactLab45Summer.json'), function(json){
+            tempMap.updateChoropleth(updateColorDataset(json["1981-2010"]));
+            nationalTemp.innerHTML = 'Average National Temp: '.concat(json["1981-2010"][51][1]);
         });
 
 
@@ -152,21 +147,39 @@
         var year = document.getElementById("yearContainer");
 
         // initial values
-        year.innerHTML = yearSlider.value;
+        year.innerHTML = "1981-2010";
 
         // change values based on slider
         yearSlider.oninput = function() {
-            $.getJSON("./static/".concat('FormattedUsaTempByYear.json'), function(json){
-                tempMap.updateChoropleth(updateColorDataset(json[yearSlider.value]));
-                var sum = 0.000000;
-                for (var i = 0; i < 51; i++) {
-                    sum += parseInt(json[yearSlider.value][i][1]);
+            console.log(yearSlider.value)
+            $.getJSON("./static/".concat('ImpactLab45Summer.json'), function(json){
+                switch (yearSlider.value) {
+                    case '1':
+                        tempMap.updateChoropleth(updateColorDataset(json["1981-2010"]));
+                        nationalTemp.innerHTML = 'Average National Temp: '.concat(json["1981-2010"][51][1]);
+                        year.innerHTML = "1981-2010";
+                        break;
+                    case '2':
+                        tempMap.updateChoropleth(updateColorDataset(json["2020-2039"]));
+                        nationalTemp.innerHTML = 'Average National Temp: '.concat(json["2020-2039"][51][1]);
+                        year.innerHTML = "2020-2039";
+                        break;
+                    case '3':
+                        tempMap.updateChoropleth(updateColorDataset(json["2040-2059"]));
+                        nationalTemp.innerHTML = 'Average National Temp: '.concat(json["2040-2059"][51][1]);
+                        year.innerHTML = "2040-2059";
+                        break;
+                    case '4':
+                        tempMap.updateChoropleth(updateColorDataset(json["2080-2099"]));
+                        nationalTemp.innerHTML = 'Average National Temp: '.concat(json["2080-2099"][51][1]);
+                        year.innerHTML = "2080-2099";
+                        break;
+                    default:
+                        tempMap.updateChoropleth(updateColorDataset(json["1981-2010"]));
+                        nationalTemp.innerHTML = 'Average National Temp: '.concat(json["1981-2010"][51][1]);
+                        year.innerHTML = "1981-2010";
                 }
-                console.log(sum);
-                nationalTemp.innerHTML = 'Average National Temp: '.concat(sum/51.0 * 1.8 + 32);
             });
-
-            year.innerHTML = this.value;
         }
     </script>
 </body>

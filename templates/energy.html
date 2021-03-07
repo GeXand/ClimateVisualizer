@@ -181,7 +181,7 @@
 
         $.getJSON("./static/".concat(json_file), function(json){
             fuelMap.updateChoropleth(updateColorDataset(json[1960]));
-            nationalUsage.innerHTML = 'National Usage: '.concat(json[1960][51][1]);
+            nationalUsage.innerHTML = 'National Usage (Billion BTUs): '.concat(json[1960][51][1]);
         });
 
         

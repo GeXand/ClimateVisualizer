@@ -29,8 +29,12 @@ def index():
 def energy():
     return render_template('energy.html')
 
-@app.route('/pred')
-def pred():
+@app.route('/future')
+def future():
+    return render_template('future.html')
+
+@app.route('/news')
+def news():
     news_ghg = getNews("greenhouse gases OR carbon emissions OR methane emissions", max_articles=6)
     news_climate = getNewsClimate(max_articles=4)
     
@@ -51,7 +55,7 @@ def pred():
     keywords_1, keywords_2, keywords_3, keywords_4, keywords_5, keywords_6, keywords_7, keywords_8, keywords_9, keywords_10 = \
     nlp_1['keywords'], nlp_2['keywords'], nlp_3['keywords'], nlp_4['keywords'], nlp_5['keywords'], nlp_6['keywords'], nlp_7['keywords'], nlp_8['keywords'], nlp_9['keywords'], nlp_10['keywords']
     
-    return render_template('pred.html', 
+    return render_template('news.html', 
                            title_1=title_1, title_2=title_2, title_3=title_3, title_4=title_4, title_5=title_5, title_6=title_6, title_7=title_7, title_8=title_8, title_9=title_9, title_10=title_10, 
                            href_1=href_1, href_2=href_2, href_3=href_3, href_4=href_4, href_5=href_5, href_6=href_6, href_7=href_7, href_8=href_8, href_9=href_9, href_10=href_10, 
                            sum_1=sum_1, sum_2=sum_2, sum_3=sum_3, sum_4=sum_4, sum_5=sum_5, sum_6=sum_6, sum_7=sum_7, sum_8=sum_8, sum_9=sum_9, sum_10=sum_10,
