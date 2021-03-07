@@ -3,19 +3,19 @@ import numpy as np
 from pygooglenews import GoogleNews
 from scraper import getNews
 from newspaper import Article
+import nltk
+
+nltk.download('punkt')
 
 app = Flask(__name__)
 
 def extract(url):
-    try:
-        article = Article(url)
-        article.download()
-        article.parse()
-        article.nlp()
-        return {"summary": article.summary, "keywords": article.keywords}
-    except Exception as e:
-        print(e)
-        return {"summary": "", "keywords": []}
+    article = Article(url)
+    article.download()
+    article.parse()
+    article.nlp()
+    return {"summary": article.summary, "keywords": article.keywords}
+
 
 @app.route('/')
 def index():
@@ -27,8 +27,12 @@ def energy():
 
 @app.route('/pred')
 def pred():
-    article_obj = extract('https://www.theguardian.com/environment/2020/aug/31/australias-big-polluters-required-to-offset-just-12-of-greenhouse-gas-emissions-in-past-year%27')
-    return render_template('pred.html', title='pee pee', link='poo poo',
+    news = {'title': 'INSIGHT: Resilient energy demand may delay shift from fossil fuels - ICIS',
+ 'href': 'https://www.icis.com/explore/resources/news/2021/03/04/10613658/insight-resilient-energy-demand-may-delay-shift-from-fossil-fuels'}
+    #news = getNews("carbon emissions OR greenhouse gas OR co2 emissions", max_articles=20)
+    curArticle = news
+    article_obj = extract(curArticle['href'])
+    return render_template('pred.html', title=curArticle['title'], link=curArticle['href'], 
                            summary=article_obj['summary'], keywords=', '.join(article_obj['keywords']))
 
 

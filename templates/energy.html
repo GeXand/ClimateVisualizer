@@ -65,9 +65,36 @@
             dataset = {};
 
             var seriesValues = series.map(function(obj) {return obj[1]; });
-            // for total
-            var minValue = 100000;//Math.min.apply(null, seriesValues);
-            var maxValue = 13000000; //Math.max.apply(null, seriesValues);
+            switch(json_file) {
+                case 'TotalEnergyConsumption.json':
+                    var minValue = 100000;//Math.min.apply(null, seriesValues);
+                    var maxValue = 13000000; //Math.max.apply(null, seriesValues);
+                    break;
+                case 'RenewSolar.json':
+                    var minValue = 0;//Math.min.apply(null, seriesValues);
+                    var maxValue = 60000; //Math.max.apply(null, seriesValues);
+                    break;
+                case 'RenewHydropower.json':
+                    var minValue = 0;//Math.min.apply(null, seriesValues);
+                    var maxValue = 300000; //Math.max.apply(null, seriesValues);
+                    break;
+                case 'RenewBiomass.json':
+                    var minValue = 2000;//Math.min.apply(null, seriesValues);
+                    var maxValue = 250000; //Math.max.apply(null, seriesValues);
+                    break;
+                case 'NaturalGasConsumption.json':
+                    var minValue = 10000;//Math.min.apply(null, seriesValues);
+                    var maxValue = 4000000; //Math.max.apply(null, seriesValues);
+                    break;
+                case 'PetroleumConsumption.json':
+                    var minValue = 10000;//Math.min.apply(null, seriesValues);
+                    var maxValue = 1250000; //Math.max.apply(null, seriesValues);
+                    break;
+                default:
+                    var minValue = 100000;//Math.min.apply(null, seriesValues);
+                    var maxValue = 13000000; //Math.max.apply(null, seriesValues);
+            }
+
 
             var paletteScale = d3.scale.linear().domain([minValue, maxValue]).range(['#ffff00','#ff0000']);
 
@@ -100,7 +127,10 @@
 
         var nationalUsage = document.getElementById("nationalUsageContainer");
         
-        $.getJSON("{{ url_for('static', filename='TotalEnergyConsumption.json') }}", function(json){
+        
+        var json_file = "TotalEnergyConsumption.json";
+
+        $.getJSON("./static/".concat(json_file), function(json){
             fuelMap.updateChoropleth(updateColorDataset(json[1960]));
             nationalUsage.innerHTML = 'National Usage: '.concat(json[1960][51][1]);
         });
@@ -108,18 +138,41 @@
         
         var fuelDisplay = document.getElementById("energyInfoDisplayed");
 
-        fuelDisplay.onchange = function () {
-            switch(this.value) {
-                case total:
-                    
-            }
-        }
-
         // Year slider display
         var yearSlider = document.getElementById("historicalYearSlider");
         var year = document.getElementById("yearContainer");
 
-        
+        fuelDisplay.onchange = function () {
+            switch(this.value) {
+                case 'total':
+                    json_file = "TotalEnergyConsumption.json"
+                    break;
+                case 'solar':
+                    json_file = "RenewSolar.json"
+                    break;
+                case 'hydro':
+                    json_file = "RenewHydropower.json"
+                    break;
+                case 'biomass':
+                    json_file = "RenewBiomass.json"
+                    break;
+                case 'gas':
+                    json_file = "NaturalGasConsumption.json"
+                    break;
+                case 'petrol':
+                    json_file = "PetroleumConsumption.json"
+                    break;
+                default:
+                    json_file = "TotalEnergyConsumption.json";
+            }
+
+            $.getJSON("./static/".concat(json_file), function(json){
+                fuelMap.updateChoropleth(updateColorDataset(json[yearSlider.value]));
+                nationalUsage.innerHTML = 'National Usage: '.concat(json[yearSlider.value][51][1]);
+            });
+        }
+
+
         // initial values
         year.innerHTML = yearSlider.value;
 
@@ -127,7 +180,7 @@
         yearSlider.oninput = function() {
             // TODO: change the data displayed by the map
             if (this.value > 1959) {
-                $.getJSON("{{ url_for('static', filename='TotalEnergyConsumption.json') }}", function(json){
+                $.getJSON("./static/".concat(json_file), function(json){
                     fuelMap.updateChoropleth(updateColorDataset(json[yearSlider.value]));
                     nationalUsage.innerHTML = 'National Usage: '.concat(json[yearSlider.value][51][1]);
                 });
