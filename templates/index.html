@@ -6,50 +6,139 @@
 
     <title>Visualizing Climate Change</title>
 
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <!-- jQuery library -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <!-- Latest compiled JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <!--D3 For Map Drawing-->
     <script src="//cdnjs.cloudflare.com/ajax/libs/d3/3.5.3/d3.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/topojson/1.6.9/topojson.min.js"></script>
     <script src="{{ url_for('static', filename='node_modules/datamaps/dist/datamaps.all.min.js') }}"></script>
+
+    <style>
+    /* Dunno what I'm doing here */
+    </style>
 </head>
 <body>
-    <div id="container" style="position: relative; width: 800px; height: 500px;"></div>
+    <h1>Historical Climate Change</h1>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="row">
+                    <div id="nationalTempContainer" class="col-lg-6">National Average Temperature: </div>
+
+                    <div class="col-lg-6">
+                        <select name="tempDisplayType" id="tempInfoDisplayed">
+                            <option value="annualTemps">Average Annual Temps</option>
+                            <option value="summerTemps">Average Jun/Jul/Aug Temps</option>
+                            <option value="winterTemps">Average Dec/Jan/Feb Temps</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div id="tempMapContainer" class= "row"></div>
+
+                <div id="tempMapKey" class="row">
+                </div>
+
+                <!--
+                <div id="tempType">
+                    <button class="fahrenheit is-active">°F</button>
+                    <button class="celsius">°C</button>
+                </div>
+                -->
+
+            </div>
+            <div class="col-lg-6">
+                <div class="row">
+                    <div id="nationalUsageContainer" class="col-lg-6">National Usage: </div>
+
+                    <div id="fuelDisplayType" class="col-lg-6">
+                        <select name="energyDisplayType" id="energyInfoDisplayed">
+                            <option value="totalEnergy">Total Energy Consumption</option>
+                            <option value="solarEnergy">Solar Consumption</option>
+                            <option value="hydroEnergy">Hydro Consumption</option>
+                            <option value="gasEnergy">Natural Gas Consumption</option>
+                            <option value="petrolEnergy">Petroleum Consumption</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div id="fuelMapContainer" class="row"></div>
+
+                <div id="fuelMapKey" class="row">
+                </div>
+
+
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <input type="range" min="1901" max="2012" value="1901" class="slider" id="historicalYearSlider">
+            <div id="yearContainer"></div>
+            <div id="test"></div>
+        </div>
+    </div>
 
     <script>
-        var series = [
-            ["BLR",75],["BLZ",43],["RUS",50],["RWA",88],["SRB",21],["TLS",43],
-            ["REU",21],["TKM",19],["TJK",60],["ROU",4],["TKL",44],["GNB",38],
-            ["GUM",67],["GTM",2],["SGS",95],["GRC",60],["GNQ",57],["GLP",53],
-            ["JPN",59],["GUY",24],["GGY",4],["GUF",21],["GEO",42],["GRD",65],
-            ["GBR",14],["GAB",47],["SLV",15],["GIN",19],["GMB",63],["GRL",56],
-            ["ERI",57],["MNE",93],["MDA",39],["MDG",71],["MAF",16],["MAR",8],
-            ["MCO",25],["UZB",81],["MMR",21],["MLI",95],["MAC",33],["MNG",93],
-            ["MHL",15],["MKD",52],["MUS",19],["MLT",69],["MWI",37],["MDV",44],
-            ["MTQ",13],["MNP",21],["MSR",89],["MRT",20],["IMN",72],["UGA",59],
-            ["TZA",62],["MYS",75],["MEX",80],["ISR",77],["FRA",54],["IOT",56],
-            ["SHN",91],["FIN",51],["FJI",22],["FLK",4],["FSM",69],["FRO",70],
-            ["NIC",66],["NLD",53],["NOR",7],["NAM",63],["VUT",15],["NCL",66],
-            ["NER",34],["NFK",33],["NGA",45],["NZL",96],["NPL",21],["NRU",13],
-            ["NIU",6],["COK",19],["XKX",32],["CIV",27],["CHE",65],["COL",64],
-            ["CHN",16],["CMR",70],["CHL",15],["CCK",85],["CAN",76],["COG",20],
-            ["CAF",93],["COD",36],["CZE",77],["CYP",65],["CXR",14],["CRI",31],
-            ["CUW",67],["CPV",63],["CUB",40],["SWZ",58],["SYR",96],["SXM",31]];
+        // function csvToJson(csv) {
+        //     csv = $.get(csv).data;
+        //     console.log(csv);
+        //     var lines = csv.split("\n");
 
-        var dataset = {};
+        //     var result = {};
 
-        var onlyValues = series.map(function(obj) {return obj[1]; });
-        var minValue = Math.min.apply(null, onlyValues);
-        var maxValue = Math.max.apply(null, onlyValues);
+        //     var years = lines[0].split(",");
 
-        var paletteScale = d3.scale.linear().domain([minValue, maxValue]).range(['#ffff00','#ff0000']);
+            
+        //     for (var i = 1; i < years.length; i++) {
+        //         result[years[i]] = [];
+        //     }
 
-        series.forEach(function(item){
-            var iso = item[0];
-            var value = item[1];
-            dataset[iso] = {fillColor: paletteScale(value), temperature: value};
+
+        //     // go through each state
+        //     for (var i = 1; i < lines.length; i++) {
+
+        //         var curLine = lines[i].split(",");
+        //         // go through each year
+        //         for (var j = 1; j < lines[i].length; j++) {
+        //             result[years[j]].push([curLine[0],curLine[j]]);
+        //         }
+        //     }
+
+        //     return result;
+        // }
+        // const historicalData = require('.static/TemperaturesByStateUSA.json');
+        function updateColorDataset(series) {
+            dataset = {};
+
+            var seriesValues = series.map(function(obj) {return obj[1]; });
+            var minValue = Math.min.apply(null, seriesValues);
+            var maxValue = Math.max.apply(null, seriesValues);
+
+            var paletteScale = d3.scale.linear().domain([minValue, maxValue]).range(['#ffff00','#ff0000']);
+
+            series.forEach(function(item){
+                var iso = item[0];
+                var value = item[1];
+                dataset[iso] = {fillColor: paletteScale(value), temperature: value};
+            });
+
+            return dataset;
+        }
+
+        var fuelDataset;
+        var tempDataset;
+
+        $.getJSON("{{ url_for('static', filename='TotalEnergyByStateUSA.json') }}", function(json){
+            fuelDataset = updateColorDataset(json['1960']);
         });
 
-        var map = new Datamap({
-            element: document.getElementById('container'),
-            // scope: 'usa',
+        var tempMap = new Datamap({
+            element: document.getElementById('tempMapContainer'),
+            scope: 'usa',
             geographyConfig: {
                 highlightBorderColor: '#b7b7b7',
                 highlightBorderWidth: 2,
@@ -59,9 +148,61 @@
                         ,'<br> Temperature: ', data.temperature, '</div>'].join('');
                 }
             },
-            fills: { defaultFill: '#abdda4' },
-            data: dataset
+            fills: { defaultFill: '#ababab' },
+            data: tempDataset
         });
+
+        
+        var fuelMap = new Datamap({
+            element: document.getElementById('fuelMapContainer'),
+            scope: 'usa',
+            geographyConfig: {
+                highlightBorderColor: '#b7b7b7',
+                highlightBorderWidth: 2,
+                popupTemplate: function(geography, data) {
+                    if (!data) {return ['<div class="hoverinfo">', '<strong>', geography.properties.name, '</strong>', '</div>'].join('')}
+                    return ['<div class="hoverinfo">', '<strong>', geography.properties.name, '</strong>',
+                        ,'<br> Temperature: ', data.temperature, '</div>'].join('');
+                }
+            },
+            fills: { defaultFill: '#ababab' },
+            data: fuelDataset
+        });
+
+
+        // Year slider display
+        var yearSlider = document.getElementById("historicalYearSlider");
+        var year = document.getElementById("yearContainer");
+        var nationalTemp = document.getElementById("nationalTempContainer");
+        var nationalUsage = document.getElementById("nationalUsageContainer");
+        
+        // initial values
+        year.innerHTML = yearSlider.value;
+
+        // change values based on slider
+        yearSlider.oninput = function() {
+            // TODO: change the data displayed by the map
+            if (this.value > 1959) {
+                $.getJSON("{{ url_for('static', filename='TotalEnergyByStateUSA.json') }}", function(json){
+                    fuelMap.updateChoropleth(updateColorDataset(json[yearSlider.value]));
+                });
+            }
+            // tempMap.data = {};
+            // nationalTemp.innerHTML = {};
+            // nationalUsage.innerHTML = {};
+            year.innerHTML = this.value;
+        }
+
+        // dropdown changes
+        var tempDisplay = document.getElementById("tempInfoDisplayed");
+        tempDisplay.onchange = function () {
+
+        }
+
+        var fuelDisplay = document.getElementById("energyInfoDisplayed");
+        fuelDisplay.onchange = function () {
+
+        }
     </script>
 </body>
 </html>
