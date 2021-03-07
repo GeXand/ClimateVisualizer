@@ -88,7 +88,7 @@
     <div class="wrapper">
         <div id="tempMapContainer"></div>
         <hr>
-        <input type="range" min="1901" max="2012" value="1901" class="slider" id="historicalYearSlider">
+        <input type="range" min="1901" max="2013" value="1901" class="slider" id="historicalYearSlider">
         <div id="yearContainer"></div>
         <div id="nationalTempContainer">Temperature: too hot!</div>
     </div>
@@ -113,7 +113,6 @@
             return dataset;
         }
 
-        var fuelDataset;
         var tempDataset;
 
         $.getJSON("{{ url_for('static', filename='TotalEnergyConsumption.json') }}", function(json){
@@ -156,14 +155,7 @@
             }
             // tempMap.data = {};
             // nationalTemp.innerHTML = {};
-            // nationalUsage.innerHTML = {};
             year.innerHTML = this.value;
-        }
-
-        // dropdown changes
-        var tempDisplay = document.getElementById("tempInfoDisplayed");
-        tempDisplay.onchange = function () {
-
         }
     </script>
 </body>
