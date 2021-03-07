@@ -83,9 +83,20 @@
 </head>
 <body>
     <header>
-        <h1>RCP 4.5 Climate Predictions</h1>
+        <h1>RCP Climate Predictions</h1>
     </header>
     <div class="wrapper">
+        <div id="predDisplayType">
+            <select name="futureDisplayType" id="predInfoDisplayed">
+                <option value="rcp26summer">RCP 2.6 (Best Case) Summer Temps</option>
+                <option value="rcp26winter">RCP 2.6 (Best Case) Winter Temps</option>
+                <option value="rcp45summer">RCP 4.5 (Average Case) Summer Temps</option>
+                <option value="rcp45winter">RCP 4.5 (Average Case) Winter Temps</option>
+                <option value="rcp85summer">RCP 8.5 (Worst Case) Summer Temps</option>
+                <option value="rcp85winter">RCP 8.5 (Worst Case) Winter Temps</option>
+            </select>
+        </div>
+        
         <div id="tempMapContainer"></div>
         <hr>
         <input type="range" min="1" max="4" value="1" class="slider" id="historicalYearSlider">
@@ -99,10 +110,17 @@
             dataset = {};
 
             var seriesValues = series.map(function(obj) {return obj[1]; });
-            var minValue = 50;
-            var maxValue = 100;
 
-            var paletteScale = d3.scale.linear().domain([minValue, maxValue]).range(['#0000ff','#ffff00']);
+
+            if (json_file.includes('Summer')) {
+                var minValue = 50;
+                var maxValue = 100;
+                var paletteScale = d3.scale.linear().domain([minValue, maxValue]).range(['#00ff00','#ff0000']);
+            } else {
+                var minValue = 0;
+                var maxValue = 50;
+                var paletteScale = d3.scale.linear().domain([minValue, maxValue]).range(['#0000ff','#00ff00']);
+            }
 
             series.forEach(function(item){
                 var iso = item[0];
@@ -134,17 +152,72 @@
         var nationalTemp = document.getElementById("nationalTempContainer");
         
         
-        var json_file = "ImpactLab45Summer.json";
+        var json_file = "ImpactLab26Summer.json";
 
-        $.getJSON("./static/".concat('ImpactLab45Summer.json'), function(json){
+        $.getJSON("./static/".concat(json_file), function(json){
             tempMap.updateChoropleth(updateColorDataset(json["1981-2010"]));
             nationalTemp.innerHTML = 'Average National Temp: '.concat(json["1981-2010"][51][1]);
         });
 
+        var predDisplay = document.getElementById("predInfoDisplayed");
 
         // Year slider display
         var yearSlider = document.getElementById("historicalYearSlider");
         var year = document.getElementById("yearContainer");
+
+        predDisplay.onchange = function () {
+            switch(this.value) {
+                case 'rcp26summer':
+                    json_file = "ImpactLab26Summer.json"
+                    break;
+                case 'rcp45summer':
+                    json_file = "ImpactLab45Summer.json"
+                    break;
+                case 'rcp85summer':
+                    json_file = "ImpactLab85Summer.json"
+                    break;
+                case 'rcp26winter':
+                    json_file = "ImpactLab26Winter.json"
+                    break;
+                case 'rcp45winter':
+                    json_file = "ImpactLab45Winter.json"
+                    break;
+                case 'rcp85winter':
+                    json_file = "ImpactLab85Winter.json"
+                    break;
+                default:
+                    json_file = "ImpactLab26Summer.json";
+            }
+
+            $.getJSON("./static/".concat(json_file), function(json){
+                switch (yearSlider.value) {
+                    case '1':
+                        tempMap.updateChoropleth(updateColorDataset(json["1981-2010"]));
+                        nationalTemp.innerHTML = 'Average National Temp: '.concat(json["1981-2010"][51][1]);
+                        year.innerHTML = "1981-2010";
+                        break;
+                    case '2':
+                        tempMap.updateChoropleth(updateColorDataset(json["2020-2039"]));
+                        nationalTemp.innerHTML = 'Average National Temp: '.concat(json["2020-2039"][51][1]);
+                        year.innerHTML = "2020-2039";
+                        break;
+                    case '3':
+                        tempMap.updateChoropleth(updateColorDataset(json["2040-2059"]));
+                        nationalTemp.innerHTML = 'Average National Temp: '.concat(json["2040-2059"][51][1]);
+                        year.innerHTML = "2040-2059";
+                        break;
+                    case '4':
+                        tempMap.updateChoropleth(updateColorDataset(json["2080-2099"]));
+                        nationalTemp.innerHTML = 'Average National Temp: '.concat(json["2080-2099"][51][1]);
+                        year.innerHTML = "2080-2099";
+                        break;
+                    default:
+                        tempMap.updateChoropleth(updateColorDataset(json["1981-2010"]));
+                        nationalTemp.innerHTML = 'Average National Temp: '.concat(json["1981-2010"][51][1]);
+                        year.innerHTML = "1981-2010";
+                }
+            });
+        }
 
         // initial values
         year.innerHTML = "1981-2010";
@@ -152,7 +225,7 @@
         // change values based on slider
         yearSlider.oninput = function() {
             console.log(yearSlider.value)
-            $.getJSON("./static/".concat('ImpactLab45Summer.json'), function(json){
+            $.getJSON("./static/".concat(json_file), function(json){
                 switch (yearSlider.value) {
                     case '1':
                         tempMap.updateChoropleth(updateColorDataset(json["1981-2010"]));
