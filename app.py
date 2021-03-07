@@ -7,15 +7,12 @@ from newspaper import Article
 app = Flask(__name__)
 
 def extract(url):
-    try:
-        article = Article(url)
-        article.download()
-        article.parse()
-        article.nlp()
-        return {"summary": article.summary, "keywords": article.keywords}
-    except Exception as e:
-        print(e)
-        return {"summary": "", "keywords": []}
+    article = Article(url)
+    article.download()
+    article.parse()
+    article.nlp()
+    return {"summary": article.summary, "keywords": article.keywords}
+
 
 @app.route('/')
 def index():
