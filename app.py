@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request
 import numpy as np
 from pygooglenews import GoogleNews
-from scraper import getNews
+from scraper import getNews, getNewsClimate
 from newspaper import Article
 
 app = Flask(__name__)
